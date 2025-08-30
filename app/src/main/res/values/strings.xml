@@ -1,0 +1,5 @@
+<!-- res/values/strings.xml -->
+<resources>
+  <!-- Replace 0000000000 with your game’s project ID -->
+  <string translatable="false" name="game_services_project_id">0000000000</string>
+</resources>
