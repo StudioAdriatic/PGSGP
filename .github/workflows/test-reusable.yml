@@ -58,8 +58,9 @@ jobs:
         if: success() || failure()
         with:
           name: Test Results Godot ${{ matrix.godot_version }}
-          path: app/build/test-results/test/*.xml
+          path: 'app/build/test-results/**/TEST-*.xml'
           reporter: java-junit
+          fail-on-empty: false
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
