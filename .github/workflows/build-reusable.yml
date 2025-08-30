@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        godot_version: ${{ inputs.use_matrix && fromJson('["4.4.1", "4.3", "4.2.2", "4.1.4", "4.0.4", "3.6.1"]') || fromJson(format('["{0}"]', inputs.godot_version)) }}
+        godot_version: ${{ inputs.use_matrix && fromJson('["4.4.1", "4.3", "4.2.2", "4.1.4", "4.0.4"]') || fromJson(format('["{0}"]', inputs.godot_version)) }}
     
     steps:
       - uses: actions/checkout@v4
