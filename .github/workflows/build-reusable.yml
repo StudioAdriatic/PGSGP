@@ -1,0 +1,81 @@
+name: Reusable Build Workflow
+
+on:
+  workflow_call:
+    inputs:
+      godot_version:
+        required: false
+        type: string
+        default: '4.4.1'
+      use_matrix:
+        required: false
+        type: boolean
+        default: false
+      upload_artifacts:
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        godot_version: ${{ inputs.use_matrix && fromJson('["4.4.1", "4.3", "4.2.2", "4.1.4", "4.0.4", "3.6.1"]') || fromJson(format('["{0}"]', inputs.godot_version)) }}
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Setup godot-lib
+        run: |
+          mkdir -p godot-lib
+          filename="godot-lib.${{ matrix.godot_version }}.stable.template_release.aar"
+          echo "configurations.maybeCreate(\"default\")" > godot-lib/build.gradle
+          echo "artifacts.add(\"default\", file('$filename'))" >> godot-lib/build.gradle
+          url="https://github.com/godotengine/godot/releases/download/${{ matrix.godot_version }}-stable/${filename}"
+          curl -L -o "godot-lib/${filename}" "$url"
+
+      - name: Build with Gradle
+        run: ./gradlew build
+
+      - name: List build outputs
+        if: inputs.upload_artifacts
+        run: find app/build/outputs/aar/ -name "*.aar" -type f
+
+      - name: Rename AAR for release
+        if: inputs.upload_artifacts
+        run: |
+          mv app/build/outputs/aar/GodotPlayGamesServices.release.aar GodotPlayGamesServices-godot-${{ matrix.godot_version }}.aar
+
+      - name: Upload AAR as artifact
+        if: inputs.upload_artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: gpgs-godot-${{ matrix.godot_version }}
+          path: GodotPlayGamesServices-godot-${{ matrix.godot_version }}.aar
+
+      - name: Upload build artifacts (CI)
+        if: ${{ !inputs.upload_artifacts }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts-godot-${{ matrix.godot_version }}
+          path: app/build/outputs/aar/
