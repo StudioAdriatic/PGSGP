@@ -8,9 +8,6 @@
             android:name="org.godotengine.plugin.v1.GodotPlayGamesServices"
             android:value="com.studioadriatic.gpgs.PlayGameServicesGodot" />
 
-        <meta-data
-            android:name="com.google.android.gms.games.APP_ID"
-            android:value="@string/game_services_project_id"/>
     </application>
 
 </manifest>

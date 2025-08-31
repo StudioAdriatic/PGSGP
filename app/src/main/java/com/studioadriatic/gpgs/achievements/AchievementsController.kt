@@ -2,11 +2,11 @@ package com.studioadriatic.gpgs.achievements
 
 import android.app.Activity
 import android.util.Log
-import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.games.PlayGames
 import com.google.android.gms.games.achievement.Achievement
 import com.google.gson.Gson
 import com.studioadriatic.gpgs.model.AchievementInfo
+import com.studioadriatic.gpgs.utils.AuthenticationHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -21,72 +21,81 @@ class AchievementsController(
         const val RC_ACHIEVEMENT_UI = 9003
     }
 
-    private fun isSignedIn(): Boolean = GoogleSignIn.getLastSignedInAccount(activity) != null
-
     fun unlockAchievement(achievementName: String) {
-        if (!isSignedIn()) {
-            achievementsListener.onAchievementUnlockingFailed(achievementName)
-            return
-        }
+        CoroutineScope(Dispatchers.Main).launch {
+            if (!AuthenticationHelper.isSignedIn(activity)) {
+                achievementsListener.onAchievementUnlockingFailed(achievementName)
+                return@launch
+            }
 
-        try {
-            PlayGames.getAchievementsClient(activity).unlock(achievementName)
-            achievementsListener.onAchievementUnlocked(achievementName)
-        } catch (e: Exception) {
-            Log.e("godot", "Failed to unlock achievement: $achievementName", e)
-            achievementsListener.onAchievementUnlockingFailed(achievementName)
+            try {
+                PlayGames.getAchievementsClient(activity).unlock(achievementName)
+                achievementsListener.onAchievementUnlocked(achievementName)
+            } catch (e: Exception) {
+                Log.e("godot", "Failed to unlock achievement: $achievementName", e)
+                achievementsListener.onAchievementUnlockingFailed(achievementName)
+            }
         }
     }
 
     fun revealAchievement(achievementName: String) {
-        if (!isSignedIn()) {
-            achievementsListener.onAchievementRevealingFailed(achievementName)
-            return
-        }
+        CoroutineScope(Dispatchers.Main).launch {
+            if (!AuthenticationHelper.isSignedIn(activity)) {
+                achievementsListener.onAchievementRevealingFailed(achievementName)
+                return@launch
+            }
 
-        try {
-            PlayGames.getAchievementsClient(activity).reveal(achievementName)
-            achievementsListener.onAchievementRevealed(achievementName)
-        } catch (e: Exception) {
-            Log.e("godot", "Failed to reveal achievement: $achievementName", e)
-            achievementsListener.onAchievementRevealingFailed(achievementName)
+            try {
+                PlayGames.getAchievementsClient(activity).reveal(achievementName)
+                achievementsListener.onAchievementRevealed(achievementName)
+            } catch (e: Exception) {
+                Log.e("godot", "Failed to reveal achievement: $achievementName", e)
+                achievementsListener.onAchievementRevealingFailed(achievementName)
+            }
         }
     }
 
     fun incrementAchievement(achievementName: String, step: Int) {
-        if (!isSignedIn()) {
-            achievementsListener.onAchievementIncrementingFailed(achievementName)
-            return
-        }
+        CoroutineScope(Dispatchers.Main).launch {
+            if (!AuthenticationHelper.isSignedIn(activity)) {
+                achievementsListener.onAchievementIncrementingFailed(achievementName)
+                return@launch
+            }
 
-        try {
-            PlayGames.getAchievementsClient(activity).increment(achievementName, step)
-            achievementsListener.onAchievementIncremented(achievementName)
-        } catch (e: Exception) {
-            Log.e("godot", "Failed to increment achievement: $achievementName", e)
-            achievementsListener.onAchievementIncrementingFailed(achievementName)
+            try {
+                PlayGames.getAchievementsClient(activity).increment(achievementName, step)
+                achievementsListener.onAchievementIncremented(achievementName)
+            } catch (e: Exception) {
+                Log.e("godot", "Failed to increment achievement: $achievementName", e)
+                achievementsListener.onAchievementIncrementingFailed(achievementName)
+            }
         }
     }
 
     fun setAchievementSteps(achievementName: String, steps: Int) {
-        if (!isSignedIn()) {
-            achievementsListener.onAchievementStepsSettingFailed(achievementName)
-            return
-        }
+        CoroutineScope(Dispatchers.Main).launch {
+            if (!AuthenticationHelper.isSignedIn(activity)) {
+                achievementsListener.onAchievementStepsSettingFailed(achievementName)
+                return@launch
+            }
 
-        try {
-            PlayGames.getAchievementsClient(activity).setSteps(achievementName, steps)
-            achievementsListener.onAchievementStepsSet(achievementName)
-        } catch (e: Exception) {
-            Log.e("godot", "Failed to set achievement steps: $achievementName", e)
-            achievementsListener.onAchievementStepsSettingFailed(achievementName)
+            try {
+                PlayGames.getAchievementsClient(activity).setSteps(achievementName, steps)
+                achievementsListener.onAchievementStepsSet(achievementName)
+            } catch (e: Exception) {
+                Log.e("godot", "Failed to set achievement steps: $achievementName", e)
+                achievementsListener.onAchievementStepsSettingFailed(achievementName)
+            }
         }
     }
 
     fun showAchievements() {
-        if (!isSignedIn()) return
-
         CoroutineScope(Dispatchers.Main).launch {
+            if (!AuthenticationHelper.isSignedIn(activity)) {
+                Log.w("godot", "Cannot show achievements: user not signed in")
+                return@launch
+            }
+
             try {
                 val intent = PlayGames.getAchievementsClient(activity).achievementsIntent.await()
                 activity.startActivityForResult(intent, RC_ACHIEVEMENT_UI)
@@ -97,12 +106,12 @@ class AchievementsController(
     }
 
     fun loadAchievementInfo(forceReload: Boolean) {
-        if (!isSignedIn()) {
-            achievementsListener.onAchievementInfoLoadingFailed()
-            return
-        }
-
         CoroutineScope(Dispatchers.Main).launch {
+            if (!AuthenticationHelper.isSignedIn(activity)) {
+                achievementsListener.onAchievementInfoLoadingFailed()
+                return@launch
+            }
+
             try {
                 val result = PlayGames.getAchievementsClient(activity).load(forceReload).await()
                 val achievementData = result?.get()

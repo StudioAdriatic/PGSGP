@@ -2,12 +2,12 @@ package com.studioadriatic.gpgs.accountinfo
 
 import android.app.Activity
 import android.util.Log
-import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.games.PlayGames
 import com.google.gson.Gson
 import com.studioadriatic.gpgs.model.PlayerInfo
 import com.studioadriatic.gpgs.model.PlayerLevel
 import com.studioadriatic.gpgs.model.PlayerLevelInfo
+import com.studioadriatic.gpgs.utils.AuthenticationHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -18,15 +18,13 @@ class PlayerInfoController(
     private val playerInfoListener: PlayerInfoListener
 ) {
 
-    private fun isSignedIn(): Boolean = GoogleSignIn.getLastSignedInAccount(activity) != null
-
     fun fetchPlayerInfo() {
-        if (!isSignedIn()) {
-            playerInfoListener.onPlayerInfoLoadingFailed()
-            return
-        }
-
         CoroutineScope(Dispatchers.Main).launch {
+            if (!AuthenticationHelper.isSignedIn(activity)) {
+                playerInfoListener.onPlayerInfoLoadingFailed()
+                return@launch
+            }
+
             try {
                 val player = PlayGames.getPlayersClient(activity).currentPlayer.await()
 

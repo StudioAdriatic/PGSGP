@@ -2,11 +2,11 @@ package com.studioadriatic.gpgs.savedgames
 
 import android.app.Activity
 import android.util.Log
-import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.games.PlayGames
 import com.google.android.gms.games.SnapshotsClient
 import com.google.android.gms.games.snapshot.Snapshot
 import com.google.android.gms.games.snapshot.SnapshotMetadataChange
+import com.studioadriatic.gpgs.utils.AuthenticationHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -22,17 +22,15 @@ class SavedGamesController(
         const val RC_SAVED_GAMES = 9009
     }
 
-    private fun isSignedIn(): Boolean = GoogleSignIn.getLastSignedInAccount(activity) != null
-
     fun showSavedGamesUI(
         title: String,
         allowAddBtn: Boolean,
         allowDeleteBtn: Boolean,
         maxNumberOfSavedGamesToShow: Int
     ) {
-        if (!isSignedIn()) return
-
         CoroutineScope(Dispatchers.Main).launch {
+            if (!AuthenticationHelper.isSignedIn(activity)) return@launch
+
             try {
                 val intent = PlayGames.getSnapshotsClient(activity).getSelectSnapshotIntent(
                     title,
@@ -52,12 +50,12 @@ class SavedGamesController(
         dataToSave: String,
         description: String
     ) {
-        if (!isSignedIn()) {
-            savedGamesListener.onSavedGameFailed()
-            return
-        }
-
         CoroutineScope(Dispatchers.Main).launch {
+            if (!AuthenticationHelper.isSignedIn(activity)) {
+                savedGamesListener.onSavedGameFailed()
+                return@launch
+            }
+
             try {
                 val snapshotsClient = PlayGames.getSnapshotsClient(activity)
                 val conflictResolutionPolicy = SnapshotsClient.RESOLUTION_POLICY_MOST_RECENTLY_MODIFIED
@@ -88,12 +86,12 @@ class SavedGamesController(
     }
 
     fun loadSnapshot(gameName: String) {
-        if (!isSignedIn()) {
-            savedGamesListener.onSavedGameLoadFailed()
-            return
-        }
-
         CoroutineScope(Dispatchers.Main).launch {
+            if (!AuthenticationHelper.isSignedIn(activity)) {
+                savedGamesListener.onSavedGameLoadFailed()
+                return@launch
+            }
+
             try {
                 val snapshotsClient = PlayGames.getSnapshotsClient(activity)
                 val conflictResolutionPolicy = SnapshotsClient.RESOLUTION_POLICY_MOST_RECENTLY_MODIFIED

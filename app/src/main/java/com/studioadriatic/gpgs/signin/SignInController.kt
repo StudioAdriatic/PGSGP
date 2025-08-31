@@ -7,6 +7,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.games.PlayGames
+import com.google.android.gms.games.PlayGamesSdk
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -22,6 +23,8 @@ class SignInController(
     }
 
     private val googleSignInClient: GoogleSignInClient = GoogleSignIn.getClient(activity, GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN)
+    private var isUserAuthenticated: Boolean = false
+    private var currentUserProfile: UserProfile? = null
 
     fun signIn() {
         CoroutineScope(Dispatchers.Main).launch {
@@ -31,32 +34,53 @@ class SignInController(
                 
                 if (authResult.isAuthenticated) {
                     Log.i("godot", "Using cached signin data")
+                    isUserAuthenticated = true
                     handleSuccessfulSignIn()
                 } else {
                     Log.i("godot", "Using new signin data")
                     val signInResult = gamesSignInClient.signIn().await()
                     if (signInResult.isAuthenticated) {
+                        isUserAuthenticated = true
                         handleSuccessfulSignIn()
                     } else {
+                        isUserAuthenticated = false
+                        currentUserProfile = null
                         signInListener.onSignInFailed(-1)
                     }
                 }
             } catch (e: Exception) {
                 Log.e("godot", "Sign in failed", e)
+                isUserAuthenticated = false
+                currentUserProfile = null
                 signInListener.onSignInFailed(e.hashCode())
             }
         }
     }
 
     private fun handleSuccessfulSignIn() {
-        val lastSignedInAccount = GoogleSignIn.getLastSignedInAccount(activity)
-        val userProfile = UserProfile(
-            lastSignedInAccount?.displayName,
-            lastSignedInAccount?.email,
-            lastSignedInAccount?.idToken,
-            lastSignedInAccount?.id
-        )
-        signInListener.onSignedInSuccessfully(userProfile)
+        CoroutineScope(Dispatchers.Main).launch {
+            try {
+                // Use Play Games Services to get player info instead of deprecated GoogleSignIn
+                val playersClient = PlayGames.getPlayersClient(activity)
+                val player = playersClient.currentPlayer.await()
+                
+                val userProfile = UserProfile(
+                    player.displayName,
+                    null, // Email is not available through Play Games Services
+                    null, // ID token is not available through Play Games Services
+                    player.playerId
+                )
+                
+                currentUserProfile = userProfile
+                signInListener.onSignedInSuccessfully(userProfile)
+            } catch (e: Exception) {
+                Log.e("godot", "Failed to get player info", e)
+                // Fallback to basic profile
+                val userProfile = UserProfile(null, null, null, null)
+                currentUserProfile = userProfile
+                signInListener.onSignedInSuccessfully(userProfile)
+            }
+        }
     }
 
     fun onSignInActivityResult(data: Intent?) {
@@ -70,6 +94,8 @@ class SignInController(
         CoroutineScope(Dispatchers.Main).launch {
             try {
                 googleSignInClient.signOut().await()
+                isUserAuthenticated = false
+                currentUserProfile = null
                 signInListener.onSignOutSuccess()
             } catch (e: Exception) {
                 Log.e("godot", "Sign out failed", e)
@@ -79,7 +105,28 @@ class SignInController(
     }
 
     fun isSignedIn(): Boolean {
-        return GoogleSignIn.getLastSignedInAccount(activity) != null
+        return isUserAuthenticated
+    }
+
+    // Method to check authentication status using Play Games Services
+    fun checkAuthenticationStatus() {
+        CoroutineScope(Dispatchers.Main).launch {
+            try {
+                val gamesSignInClient = PlayGames.getGamesSignInClient(activity)
+                val authResult = gamesSignInClient.isAuthenticated.await()
+                isUserAuthenticated = authResult.isAuthenticated
+                
+                if (!isUserAuthenticated) {
+                    currentUserProfile = null
+                }
+                
+                Log.i("godot", "Authentication status checked: $isUserAuthenticated")
+            } catch (e: Exception) {
+                Log.e("godot", "Failed to check authentication status", e)
+                isUserAuthenticated = false
+                currentUserProfile = null
+            }
+        }
     }
 
 }

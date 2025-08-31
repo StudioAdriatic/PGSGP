@@ -2,10 +2,10 @@ package com.studioadriatic.gpgs.events
 
 import android.app.Activity
 import android.util.Log
-import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.games.PlayGames
 import com.google.android.gms.games.event.Event
 import com.google.gson.Gson
+import com.studioadriatic.gpgs.utils.AuthenticationHelper
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -24,30 +24,30 @@ class EventsController(
     private val eventsListener: EventsListener
 ) {
 
-    private fun isSignedIn(): Boolean = GoogleSignIn.getLastSignedInAccount(activity) != null
-
     fun submitEvent(eventId: String, incrementBy: Int) {
-        if (!isSignedIn()) {
-            eventsListener.onEventSubmittingFailed(eventId)
-            return
-        }
+        CoroutineScope(Dispatchers.Main).launch {
+            if (!AuthenticationHelper.isSignedIn(activity)) {
+                eventsListener.onEventSubmittingFailed(eventId)
+                return@launch
+            }
 
-        try {
-            PlayGames.getEventsClient(activity).increment(eventId, incrementBy)
-            eventsListener.onEventSubmitted(eventId)
-        } catch (e: Exception) {
-            Log.e("godot", "Failed to submit event: $eventId", e)
-            eventsListener.onEventSubmittingFailed(eventId)
+            try {
+                PlayGames.getEventsClient(activity).increment(eventId, incrementBy)
+                eventsListener.onEventSubmitted(eventId)
+            } catch (e: Exception) {
+                Log.e("godot", "Failed to submit event: $eventId", e)
+                eventsListener.onEventSubmittingFailed(eventId)
+            }
         }
     }
 
     fun loadEvents() {
-        if (!isSignedIn()) {
-            eventsListener.onEventsLoadingFailed()
-            return
-        }
-
         CoroutineScope(Dispatchers.Main).launch {
+            if (!AuthenticationHelper.isSignedIn(activity)) {
+                eventsListener.onEventsLoadingFailed()
+                return@launch
+            }
+
             try {
                 val result = PlayGames.getEventsClient(activity).load(true).await()
                 val events = result?.get()
@@ -74,12 +74,12 @@ class EventsController(
     }
 
     fun loadEventById(eventIds: Array<String>) {
-        if (!isSignedIn()) {
-            eventsListener.onEventsLoadingFailed()
-            return
-        }
-
         CoroutineScope(Dispatchers.Main).launch {
+            if (!AuthenticationHelper.isSignedIn(activity)) {
+                eventsListener.onEventsLoadingFailed()
+                return@launch
+            }
+
             try {
                 val result = PlayGames.getEventsClient(activity).loadByIds(true, *eventIds).await()
                 val events = result?.get()
