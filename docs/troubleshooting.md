@@ -111,7 +111,7 @@ This guide helps you diagnose and fix common issues when using the Google Play G
 1. **Check Initialization Parameters**:
    ```gdscript
    # Request email and profile data
-   play_games_services.init(true, true, false, "")
+   play_games_services.init(true, false, "")
    #                        ↑     ↑
    #                   email  profile
    ```
