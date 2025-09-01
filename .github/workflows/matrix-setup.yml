@@ -1,0 +1,35 @@
+name: Matrix Setup
+
+on:
+  workflow_call:
+    outputs:
+      godot-versions:
+        description: "JSON array of supported Godot versions"
+        value: ${{ jobs.setup.outputs.godot-versions }}
+      godot-versions-string:
+        description: "Space-separated string of supported Godot versions"
+        value: ${{ jobs.setup.outputs.godot-versions-string }}
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      godot-versions: ${{ steps.versions.outputs.godot-versions }}
+      godot-versions-string: ${{ steps.versions.outputs.godot-versions-string }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Read versions configuration
+        id: versions
+        run: |
+          # Read the versions from the JSON file
+          GODOT_VERSIONS=$(cat .github/versions.json | jq -c '.godot')
+          echo "godot-versions=$GODOT_VERSIONS" >> $GITHUB_OUTPUT
+          
+          # Also create a space-separated string version for shell loops
+          GODOT_VERSIONS_STRING=$(cat .github/versions.json | jq -r '.godot | join(" ")')
+          echo "godot-versions-string=$GODOT_VERSIONS_STRING" >> $GITHUB_OUTPUT
+          
+          echo "Loaded Godot versions: $GODOT_VERSIONS"
+          echo "Versions string: $GODOT_VERSIONS_STRING"
