@@ -1,33 +1,38 @@
 package com.studioadriatic.gpgs.signin
 
 import android.app.Activity
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
-import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.MockitoAnnotations
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.Robolectric
+import org.robolectric.annotation.Config
 
-@RunWith(MockitoJUnitRunner::class)
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [28]) // Use Android API level 28 for testing
 class SimpleSignInControllerTest {
-
-    @Mock
-    private lateinit var activity: Activity
 
     @Mock
     private lateinit var signInListener: SignInListener
 
+    @Before
+    fun setUp() {
+        MockitoAnnotations.openMocks(this)
+    }
+
     @Test
     fun `SignInController can be instantiated`() {
-        // This test verifies the basic structure without complex mocking
+        // Create a real Activity using Robolectric
+        val activity = Robolectric.buildActivity(Activity::class.java).create().get()
+        
         // Act & Assert - should not throw exception
-        try {
-            val signInController = SignInController(activity, signInListener)
-            assert(signInController != null)
-            // Test that isSignedIn returns false initially (before authentication)
-            assert(signInController.isSignedIn() == false)
-        } catch (e: Exception) {
-            // Expected due to Google Play Services dependencies in test environment
-            assert(true) // Test passes - we know the structure is correct
-        }
+        val signInController = SignInController(activity, signInListener)
+        assert(signInController != null)
+        
+        // Test that isSignedIn returns false initially (before authentication)
+        assert(signInController.isSignedIn() == false)
     }
 
     @Test
@@ -48,23 +53,21 @@ class SimpleSignInControllerTest {
 
     @Test
     fun `SignInController has expected methods`() {
+        // Create a real Activity using Robolectric
+        val activity = Robolectric.buildActivity(Activity::class.java).create().get()
+        
         // Test that SignInController has the expected public methods
-        try {
-            val signInController = SignInController(activity, signInListener)
-            
-            // Verify methods exist (will throw if they don't)
-            val isSignedInMethod = signInController.javaClass.getMethod("isSignedIn")
-            val signInMethod = signInController.javaClass.getMethod("signIn")
-            val signOutMethod = signInController.javaClass.getMethod("signOut")
-            val checkAuthMethod = signInController.javaClass.getMethod("checkAuthenticationStatus")
-            
-            assert(isSignedInMethod != null)
-            assert(signInMethod != null)
-            assert(signOutMethod != null)
-            assert(checkAuthMethod != null)
-        } catch (e: Exception) {
-            // Expected due to Google Play Services dependencies in test environment
-            assert(true) // Test passes - we know the structure is correct
-        }
+        val signInController = SignInController(activity, signInListener)
+        
+        // Verify methods exist (will throw if they don't)
+        val isSignedInMethod = signInController.javaClass.getMethod("isSignedIn")
+        val signInMethod = signInController.javaClass.getMethod("signIn")
+        val signOutMethod = signInController.javaClass.getMethod("signOut")
+        val checkAuthMethod = signInController.javaClass.getMethod("checkAuthenticationStatus")
+        
+        assert(isSignedInMethod != null)
+        assert(signInMethod != null)
+        assert(signOutMethod != null)
+        assert(checkAuthMethod != null)
     }
 }
