@@ -36,10 +36,10 @@ func _ready():
 		play_games_services.connect("_on_player_info_loaded", self, "_on_player_info_loaded")
 		play_games_services.connect("_on_player_info_loading_failed", self, "_on_player_info_loading_failed")
 	
-		play_games_services.init(true,false,false,"")
-#		play_games_services.init(true,true,false,"") # Use this init if you want to get email of the player
-#		play_games_services.init(true,true,true,"") # Use this init if you want to get email  and profile data of the player
+		play_games_services.init(false,false,"")
 #		play_games_services.initWithSavedGames(true, "SAVE_GAME_NAME",false, false, "") # Use this init if you want saved games feature to be enabled
+
+		play_games_services.signIn()
 
 
 # Sign-in/sign-out methods

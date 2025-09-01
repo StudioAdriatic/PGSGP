@@ -171,15 +171,15 @@ class PlayGameServicesGodot(godot: Godot) : GodotPlugin(godot), AchievementsList
         return result == ConnectionResult.SUCCESS
     }
 
-    fun init(enablePopups: Boolean, requestEmail: Boolean, requestProfile: Boolean, requestToken: String) {
-        initialize(false, enablePopups, "DefaultGame", requestEmail, requestProfile, requestToken)
+    fun init(requestEmail: Boolean, requestProfile: Boolean, requestToken: String) {
+        initialize(false, "DefaultGame", requestEmail, requestProfile, requestToken)
     }
 
-    fun initWithSavedGames(enablePopups: Boolean, saveGameName: String, requestEmail: Boolean, requestProfile: Boolean, requestToken: String) {
-        initialize(true, enablePopups, saveGameName, requestEmail, requestProfile, requestToken)
+    fun initWithSavedGames(saveGameName: String, requestEmail: Boolean, requestProfile: Boolean, requestToken: String) {
+        initialize(true, saveGameName, requestEmail, requestProfile, requestToken)
     }
 
-    private fun initialize(enableSaveGamesFunctionality: Boolean, enablePopups: Boolean, saveGameName: String,
+    private fun initialize(enableSaveGamesFunctionality: Boolean, saveGameName: String,
                            requestEmail: Boolean, requestProfile: Boolean, requestToken: String) {
         this.saveGameName = saveGameName
 
@@ -196,9 +196,6 @@ class PlayGameServicesGodot(godot: Godot) : GodotPlugin(godot), AchievementsList
         savedGamesController = SavedGamesController(activity, this)
 
         gamesSignInClient = PlayGames.getGamesSignInClient(activity)
-
-        // Note: enablePopups parameter is not used in the current implementation
-        // The modern Play Games Services SDK handles popups automatically
     }
 
     fun signIn() {
