@@ -10,7 +10,6 @@ Welcome to the comprehensive documentation for the Google Play Games Services (G
 4. [API Reference](api-reference.md)
 5. [Usage Examples](examples.md)
 6. [Troubleshooting](troubleshooting.md)
-7. [Migration Guide](migration.md)
 
 ## Overview
 
@@ -57,7 +56,6 @@ Each section of this documentation covers specific aspects of the plugin:
 - **API Reference**: Complete method and signal documentation
 - **Examples**: Practical usage examples for all features
 - **Troubleshooting**: Common issues and solutions
-- **Migration**: Upgrading from previous versions
 
 ## Support
 

@@ -20,7 +20,9 @@ This is an Android Play Games Services plugin for Godot Game Engine
 - Saved Games
 
 ### Documentation
-[https://github.com/StudioAdriatic/PGSGP/wiki](https://github.com/StudioAdriatic/PGSGP/wiki)
+
+For comprehensive documentation, please visit: [Documentation](docs/README.md)
+
 
 ### Credits
 This project is now maintained by [Studio Adriatic](https://studioadriatic.com) and originaly made by [cgisca](https://github.com/cgisca/PGSGP) and [oneseedfruit](https://github.com/oneseedfruit/PGSGP)
