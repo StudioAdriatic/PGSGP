@@ -31,12 +31,6 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Set Kotlin version
-        run: |
-          echo "Using Kotlin version: ${{ matrix.kotlin }}"
-          # Update the Kotlin version in build.gradle
-          sed -i "s/ext.kotlin_version = '[^']*'/ext.kotlin_version = '${{ matrix.kotlin }}'/" build.gradle
-
       - name: Cache Gradle packages
         uses: actions/cache@v4
         with:
@@ -60,7 +54,7 @@ jobs:
           curl -L -o "godot-lib/${filename}" "$url"
 
       - name: Run unit tests
-        run: ./gradlew test --continue
+        run: ./gradlew test --continue -Pkotlin_version=${{ matrix.kotlin }}
 
       - name: Generate test report
         uses: dorny/test-reporter@v1
