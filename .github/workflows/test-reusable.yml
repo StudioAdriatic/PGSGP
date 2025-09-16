@@ -21,7 +21,7 @@ jobs:
     needs: matrix-setup
     strategy:
       matrix:
-        godot_version: ${{ inputs.use_matrix && fromJson(needs.matrix-setup.outputs.godot-versions) || fromJson(format('["{0}"]', inputs.godot_version)) }}
+        include: ${{ inputs.use_matrix && fromJson(needs.matrix-setup.outputs.version-matrix) || fromJson(format('[{{"godot":"{0}","kotlin":"1.9.22"}}]', inputs.godot_version)) }}
     
     steps:
       - uses: actions/checkout@v4
@@ -48,20 +48,20 @@ jobs:
       - name: Setup godot-lib
         run: |
           mkdir -p godot-lib
-          filename="godot-lib.${{ matrix.godot_version }}.stable.template_release.aar"
+          filename="godot-lib.${{ matrix.godot }}.stable.template_release.aar"
           echo "configurations.maybeCreate(\"default\")" > godot-lib/build.gradle
           echo "artifacts.add(\"default\", file('$filename'))" >> godot-lib/build.gradle
-          url="https://github.com/godotengine/godot/releases/download/${{ matrix.godot_version }}-stable/${filename}"
+          url="https://github.com/godotengine/godot/releases/download/${{ matrix.godot }}-stable/${filename}"
           curl -L -o "godot-lib/${filename}" "$url"
 
       - name: Run unit tests
-        run: ./gradlew test --continue
+        run: ./gradlew test --continue -Pkotlin_version=${{ matrix.kotlin }}
 
       - name: Generate test report
         uses: dorny/test-reporter@v1
         if: success() || failure()
         with:
-          name: Test Results Godot ${{ matrix.godot_version }}
+          name: Test Results Godot ${{ matrix.godot }}
           path: 'app/build/test-results/**/TEST-*.xml'
           reporter: java-junit
           fail-on-empty: false
@@ -70,7 +70,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: test-results-godot-${{ matrix.godot_version }}
+          name: test-results-godot-${{ matrix.godot }}
           path: |
             app/build/reports/tests/
             app/build/test-results/
