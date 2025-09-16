@@ -20,7 +20,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: matrix-setup
     strategy:
-      matrix: ${{ inputs.use_matrix && fromJson(format('{"include":{0}}', needs.matrix-setup.outputs.version-matrix)) || fromJson(format('{"include":[{"godot":"{0}","kotlin":"1.9.22"}]}', inputs.godot_version)) }}
+      matrix:
+        include: ${{ inputs.use_matrix && fromJson(needs.matrix-setup.outputs.version-matrix) || fromJson(format('[{{"godot":"{0}","kotlin":"1.9.22"}}]', inputs.godot_version)) }}
     
     steps:
       - uses: actions/checkout@v4
