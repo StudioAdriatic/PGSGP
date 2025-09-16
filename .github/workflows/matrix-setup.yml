@@ -9,6 +9,12 @@ on:
       godot-versions-string:
         description: "Space-separated string of supported Godot versions"
         value: ${{ jobs.setup.outputs.godot-versions-string }}
+      kotlin-versions:
+        description: "JSON array of supported Kotlin versions"
+        value: ${{ jobs.setup.outputs.kotlin-versions }}
+      version-matrix:
+        description: "JSON array of version objects with godot and kotlin versions"
+        value: ${{ jobs.setup.outputs.version-matrix }}
 
 jobs:
   setup:
@@ -16,6 +22,8 @@ jobs:
     outputs:
       godot-versions: ${{ steps.versions.outputs.godot-versions }}
       godot-versions-string: ${{ steps.versions.outputs.godot-versions-string }}
+      kotlin-versions: ${{ steps.versions.outputs.kotlin-versions }}
+      version-matrix: ${{ steps.versions.outputs.version-matrix }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -24,12 +32,22 @@ jobs:
         id: versions
         run: |
           # Read the versions from the JSON file
-          GODOT_VERSIONS=$(cat .github/versions.json | jq -c '.godot')
+          VERSION_MATRIX=$(cat .github/versions.json | jq -c '.versions')
+          echo "version-matrix=$VERSION_MATRIX" >> $GITHUB_OUTPUT
+          
+          # Extract Godot versions for backward compatibility
+          GODOT_VERSIONS=$(cat .github/versions.json | jq -c '.versions | map(.godot)')
           echo "godot-versions=$GODOT_VERSIONS" >> $GITHUB_OUTPUT
           
+          # Extract Kotlin versions
+          KOTLIN_VERSIONS=$(cat .github/versions.json | jq -c '.versions | map(.kotlin)')
+          echo "kotlin-versions=$KOTLIN_VERSIONS" >> $GITHUB_OUTPUT
+          
           # Also create a space-separated string version for shell loops
-          GODOT_VERSIONS_STRING=$(cat .github/versions.json | jq -r '.godot | join(" ")')
+          GODOT_VERSIONS_STRING=$(cat .github/versions.json | jq -r '.versions | map(.godot) | join(" ")')
           echo "godot-versions-string=$GODOT_VERSIONS_STRING" >> $GITHUB_OUTPUT
           
+          echo "Loaded version matrix: $VERSION_MATRIX"
           echo "Loaded Godot versions: $GODOT_VERSIONS"
+          echo "Loaded Kotlin versions: $KOTLIN_VERSIONS"
           echo "Versions string: $GODOT_VERSIONS_STRING"

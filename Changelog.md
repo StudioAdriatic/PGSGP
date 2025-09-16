@@ -1,6 +1,9 @@
 # Changelog
 
-### 2.0.0
+### 3.1.0
+- Added support for Godot 4.5
+
+### 3.0.0
 Major codebase modernization and improvements:
 - **BREAKING**: Migrated to Play Games Services v2 API
 - **BREAKING**: Updated to modern Kotlin coroutines with async/await patterns
