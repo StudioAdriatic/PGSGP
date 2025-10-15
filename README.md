@@ -4,7 +4,7 @@ This is an Android Play Games Services plugin for Godot Game Engine
 ![Logo](https://repository-images.githubusercontent.com/398548770/6d15b878-3804-457d-933a-200be98927ec)
 
 [![Android](https://img.shields.io/badge/Platform-Android-brightgreen.svg)](https://developer.android.com)
-[![Godot](https://img.shields.io/badge/Godot%20Engine-4.5-blue.svg)](https://github.com/godotengine/godot/)
+[![Godot](https://img.shields.io/badge/Godot%20Engine-4.5.1-blue.svg)](https://github.com/godotengine/godot/)
 [![PGS](https://img.shields.io/badge/Play%20Games%20Services%20v2-21.0.0-green.svg)](https://developers.google.com/games/services/android/quickstart)
 [![MIT license](https://img.shields.io/badge/License-MIT-yellowgreen.svg)](https://lbesson.mit-license.org/)
 [![CI](https://github.com/StudioAdriatic/PGSGP/workflows/CI/badge.svg)](https://github.com/StudioAdriatic/PGSGP/actions/workflows/ci.yml)

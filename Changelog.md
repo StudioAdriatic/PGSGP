@@ -1,5 +1,8 @@
 # Changelog
 
+### 3.1.1
+- Added support for Godot 4.5.1
+
 ### 3.1.0
 - Added support for Godot 4.5
 

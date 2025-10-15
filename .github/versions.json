@@ -1,6 +1,10 @@
 {
   "versions": [
     {
+      "godot": "4.5.1",
+      "kotlin": "2.1.0"
+    },
+    {
       "godot": "4.5",
       "kotlin": "2.1.0"
     },
