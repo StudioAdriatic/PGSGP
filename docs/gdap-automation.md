@@ -29,7 +29,13 @@ A JSON configuration file that serves as the single source of truth for supporte
 
 ```json
 {
-  "godot": ["4.4.1", "4.3", "4.2.2", "4.1.4", "4.0.4"]
+  "versions": [
+    {
+      "godot": "4.6.3",
+      "kotlin": "2.1.0"
+    },
+    ...
+  ]
 }
 ```
 
@@ -70,6 +76,13 @@ The release workflow (`.github/workflows/release.yml`) has been enhanced to:
 - Include GDAP files in GitHub releases alongside AAR files
 
 **Supported Godot Versions:**
+- 4.6.3
+- 4.6.2
+- 4.6.1
+- 4.6
+- 4.5.2
+- 4.5.1
+- 4.5
 - 4.4.1
 - 4.3
 - 4.2.2
@@ -81,6 +94,13 @@ The release workflow (`.github/workflows/release.yml`) has been enhanced to:
 For each release, the following files are automatically generated and included:
 
 **AAR Files:**
+- `GodotPlayGamesServices-godot-4.6.3.aar`
+- `GodotPlayGamesServices-godot-4.6.2.aar`
+- `GodotPlayGamesServices-godot-4.6.1.aar`
+- `GodotPlayGamesServices-godot-4.6.aar`
+- `GodotPlayGamesServices-godot-4.5.2.aar`
+- `GodotPlayGamesServices-godot-4.5.1.aar`
+- `GodotPlayGamesServices-godot-4.5.aar`
 - `GodotPlayGamesServices-godot-4.4.1.aar`
 - `GodotPlayGamesServices-godot-4.3.aar`
 - `GodotPlayGamesServices-godot-4.2.2.aar`
@@ -88,6 +108,13 @@ For each release, the following files are automatically generated and included:
 - `GodotPlayGamesServices-godot-4.0.4.aar`
 
 **GDAP Files:**
+- `GodotPlayGamesServices-godot-4.6.3.gdap`
+- `GodotPlayGamesServices-godot-4.6.2.gdap`
+- `GodotPlayGamesServices-godot-4.6.1.gdap`
+- `GodotPlayGamesServices-godot-4.6.gdap`
+- `GodotPlayGamesServices-godot-4.5.2.gdap`
+- `GodotPlayGamesServices-godot-4.5.1.gdap`
+- `GodotPlayGamesServices-godot-4.5.gdap`
 - `GodotPlayGamesServices-godot-4.4.1.gdap`
 - `GodotPlayGamesServices-godot-4.3.gdap`
 - `GodotPlayGamesServices-godot-4.2.2.gdap`
@@ -128,7 +155,13 @@ To support a new Godot version, simply update the `.github/versions.json` file:
 
 ```json
 {
-  "godot": ["4.4.1", "4.3", "4.2.2", "4.1.4", "4.0.4", "4.5.0"]
+  "versions": [
+    {
+      "godot": "4.6.3",
+      "kotlin": "2.1.0"
+    },
+    ...
+  ]
 }
 ```
 

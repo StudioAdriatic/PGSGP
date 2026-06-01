@@ -40,10 +40,10 @@ jobs:
       - name: Setup godot-lib for lint
         run: |
           mkdir -p godot-lib
-          filename="godot-lib.4.4.1.stable.template_release.aar"
+          filename="godot-lib.4.6.3.stable.template_release.aar"
           echo "configurations.maybeCreate(\"default\")" > godot-lib/build.gradle
           echo "artifacts.add(\"default\", file('$filename'))" >> godot-lib/build.gradle
-          url="https://github.com/godotengine/godot/releases/download/4.4.1-stable/${filename}"
+          url="https://github.com/godotengine/godot/releases/download/4.6.3-stable/${filename}"
           curl -L -o "godot-lib/${filename}" "$url"
 
       - name: Run lint
@@ -60,5 +60,5 @@ jobs:
     needs: [test, lint]
     uses: ./.github/workflows/build-reusable.yml
     with:
-      godot_version: '4.4.1'
+      godot_version: '4.6.3'
       upload_artifacts: false

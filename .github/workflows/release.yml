@@ -14,7 +14,7 @@ jobs:
     needs: matrix-setup
     uses: ./.github/workflows/test-reusable.yml
     with:
-      godot_version: '4.4.1'
+      godot_version: '4.6.3'
 
   build:
     needs: test

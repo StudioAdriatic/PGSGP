@@ -6,7 +6,7 @@ on:
       godot_version:
         required: false
         type: string
-        default: '4.4.1'
+        default: '4.6.3'
       use_matrix:
         required: false
         type: boolean
@@ -21,7 +21,7 @@ jobs:
     needs: matrix-setup
     strategy:
       matrix:
-        include: ${{ inputs.use_matrix && fromJson(needs.matrix-setup.outputs.version-matrix) || fromJson(format('[{{"godot":"{0}","kotlin":"1.9.22"}}]', inputs.godot_version)) }}
+        include: ${{ inputs.use_matrix && fromJson(needs.matrix-setup.outputs.version-matrix) || fromJson(format('[{{"godot":"{0}","kotlin":"2.1.0"}}]', inputs.godot_version)) }}
     
     steps:
       - uses: actions/checkout@v4
