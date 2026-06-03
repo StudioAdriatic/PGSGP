@@ -16,26 +16,41 @@ Before installing the plugin, ensure you have:
 
 ### Method 1: Download Pre-built Plugin (Recommended)
 
-1. **Download the Plugin**
-   - Go to the [GitHub releases page](https://github.com/StudioAdriatic/PGSGP/releases)
-   - Download the latest `GodotPlayGamesServices.release.aar` file
-   - Download the corresponding `GodotPlayGamesServices.gdap` file
+#### For Godot 4.2 and later (v2 Plugin System)
 
-2. **Create Plugin Directory**
-   ```
-   your_project/
-   └── android/
-       └── plugins/
-           ├── GodotPlayGamesServices.release.aar
-           └── GodotPlayGamesServices.gdap
-   ```
+1. **Download the Plugin Addon**
+   - Go to the [GitHub releases page](https://github.com/StudioAdriatic/PGSGP/releases)
+   - Download the `GodotPlayGamesServices-godot-<version>.zip` archive for your Godot version.
+
+2. **Extract to your Project**
+   - Extract the `.zip` archive to your Godot project's root folder.
+   - It will place the plugin files under `addons/GodotPlayGamesServices/`.
+
+3. **Enable the Plugin**
+   - Open your project in Godot.
+   - Go to **Project → Project Settings → Plugins**.
+   - Enable **GodotPlayGamesServices**.
+
+4. **Install Android Build Template**
+   - Go to **Project → Install Android Build Template...** (if you haven't already).
+   - In **Project → Export... → Android export preset**, make sure **Use Gradle Build** is set to `true` (in the `Gradle Build` section).
+
+#### For Godot 4.0 and 4.1 (v1 Plugin System)
+
+1. **Download the Plugin Files**
+   - Go to the [GitHub releases page](https://github.com/StudioAdriatic/PGSGP/releases)
+   - Download the matching `GodotPlayGamesServices-godot-<version>.aar` and `GodotPlayGamesServices-godot-<version>.gdap` files.
+
+2. **Place in Plugins Directory**
+   - Create the directory `android/plugins` in your project if it doesn't exist.
+   - Place both `.aar` and `.gdap` files in that folder.
+   - Rename them to `GodotPlayGamesServices.release.aar` and `GodotPlayGamesServices.gdap`.
 
 3. **Enable Custom Build**
-   - Open your project in Godot
-   - Go to **Project → Project Settings → Export**
-   - Select **Android** platform
-   - Check **Use Custom Build**
-   - In the **Plugins** section, enable **GodotPlayGamesServices**
+   - Open your project in Godot.
+   - Go to **Project → Project Settings → Export** and select the **Android** platform.
+   - Check **Use Custom Build** (Custom Build template must be installed).
+   - In the **Plugins** section, check/enable **GodotPlayGamesServices**.
 
 ### Method 2: Build from Source
 
@@ -46,14 +61,18 @@ Before installing the plugin, ensure you have:
    ```
 
 2. **Build the Plugin**
+   - Make sure you compile using JDK 17.
    ```bash
    ./gradlew build
    ```
 
-3. **Copy Built Files**
-   - Copy `app/build/outputs/aar/app-release.aar` to your project's `android/plugins/` directory
-   - Rename it to `GodotPlayGamesServices.release.aar`
-   - Copy the `.gdap` file from the demo folder
+3. **Integrate Built Files**
+   - **For Godot 4.2+ (v2 Plugin)**:
+     - Copy the `demo/addons/GodotPlayGamesServices/` directory to your project's `addons/` directory.
+     - Copy the compiled library `app/build/outputs/aar/GodotPlayGamesServices.release.aar` to `addons/GodotPlayGamesServices/`.
+   - **For Godot 4.0 & 4.1 (v1 Plugin)**:
+     - Copy the compiled library `app/build/outputs/aar/GodotPlayGamesServices.release.aar` to your project's `android/plugins/` directory.
+     - Copy `GodotPlayGamesServices.gdap` from the project root or demo folder to your project's `android/plugins/` directory.
 
 ## Project Configuration
 

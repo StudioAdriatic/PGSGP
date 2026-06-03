@@ -28,6 +28,7 @@ import com.studioadriatic.gpgs.stats.PlayerStatsListener
 import org.godotengine.godot.Godot
 import org.godotengine.godot.plugin.GodotPlugin
 import org.godotengine.godot.plugin.SignalInfo
+import org.godotengine.godot.plugin.UsedByGodot
 import java.math.BigInteger
 import java.util.Random
 
@@ -165,16 +166,19 @@ class PlayGameServicesGodot(godot: Godot) : GodotPlugin(godot), AchievementsList
         }
     }
 
+    @UsedByGodot
     fun isGooglePlayServicesAvailable(): Boolean {
         val activity = getActivity() ?: return false
         val result: Int = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(activity)
         return result == ConnectionResult.SUCCESS
     }
 
+    @UsedByGodot
     fun init(requestEmail: Boolean, requestProfile: Boolean, requestToken: String) {
         initialize(false, "DefaultGame", requestEmail, requestProfile, requestToken)
     }
 
+    @UsedByGodot
     fun initWithSavedGames(saveGameName: String, requestEmail: Boolean, requestProfile: Boolean, requestToken: String) {
         initialize(true, saveGameName, requestEmail, requestProfile, requestToken)
     }
@@ -198,82 +202,102 @@ class PlayGameServicesGodot(godot: Godot) : GodotPlugin(godot), AchievementsList
         gamesSignInClient = PlayGames.getGamesSignInClient(activity)
     }
 
+    @UsedByGodot
     fun signIn() {
         signInController.signIn()
     }
 
+    @UsedByGodot
     fun signOut() {
         signInController.signOut()
     }
 
+    @UsedByGodot
     fun isSignedIn(): Boolean {
         return signInController.isSignedIn()
     }
 
+    @UsedByGodot
     fun showAchievements() {
         achievementsController.showAchievements()
     }
 
+    @UsedByGodot
     fun unlockAchievement(achievementName: String) {
         achievementsController.unlockAchievement(achievementName)
     }
 
+    @UsedByGodot
     fun revealAchievement(achievementName: String) {
         achievementsController.revealAchievement(achievementName)
     }
 
+    @UsedByGodot
     fun incrementAchievement(achievementName: String, step: Int) {
         achievementsController.incrementAchievement(achievementName, step)
     }
 
+    @UsedByGodot
     fun setAchievementSteps(achievementName: String, steps: Int) {
         achievementsController.setAchievementSteps(achievementName, steps)
     }
 
+    @UsedByGodot
     fun loadAchievementInfo(forceReload: Boolean) {
         achievementsController.loadAchievementInfo(forceReload)
     }
 
+    @UsedByGodot
     fun showLeaderBoard(leaderBoardId: String) {
         leaderboardsController.showLeaderboard(leaderBoardId)
     }
 
+    @UsedByGodot
     fun showAllLeaderBoards() {
         leaderboardsController.showAllLeaderboards()
     }
 
+    @UsedByGodot
     fun submitLeaderBoardScore(leaderBoardId: String, score: Int) {
         leaderboardsController.submitScore(leaderBoardId, score)
     }
 
+    @UsedByGodot
     fun submitEvent(eventId: String, incrementBy: Int) {
         eventsController.submitEvent(eventId, incrementBy)
     }
 
+    @UsedByGodot
     fun loadEvents() {
         eventsController.loadEvents()
     }
 
+    @UsedByGodot
     fun loadEventsById(ids: Array<String>) {
         eventsController.loadEventById(ids)
     }
 
+    @UsedByGodot
     fun loadPlayerStats(forceRefresh: Boolean) {
         playerStatsController.checkPlayerStats(forceRefresh)
     }
 
+    @UsedByGodot
     fun showSavedGames(title: String, allowAdBtn: Boolean, allowDeleteBtn: Boolean, maxNumberOfSavedGamesToShow: Int) {
         savedGamesController.showSavedGamesUI(title, allowAdBtn, allowDeleteBtn, maxNumberOfSavedGamesToShow)
     }
 
+    @UsedByGodot
     fun saveSnapshot(name: String, data: String, description: String) {
         savedGamesController.saveSnapshot(name, data, description)
     }
 
+    @UsedByGodot
     fun loadSnapshot(name: String) {
         savedGamesController.loadSnapshot(name)
     }
 
+    @UsedByGodot
     fun loadPlayerInfo() {
         playerInfoController.fetchPlayerInfo()
     }

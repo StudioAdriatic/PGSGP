@@ -40,23 +40,61 @@ jobs:
         with:
           path: aars
 
-      - name: Generate GDAP files for each Godot version
+      - name: Generate GDAP files or Zip Addons for each Godot version
         run: |
-          # Create directory for GDAP files
+          # Create directory for GDAP and Zip files
           mkdir -p gdap-files
           
-          # Generate GDAP files for each Godot version
+          # Helper function to check if version is less than 4.2
+          is_less_than_42() {
+            local version=$1
+            # Split version by .
+            IFS='.' read -r -a parts <<< "$version"
+            local major=${parts[0]}
+            local minor=${parts[1]}
+            if [ "$major" -lt 4 ]; then
+              return 0
+            elif [ "$major" -eq 4 ] && [ "$minor" -lt 2 ]; then
+              return 0
+            fi
+            return 1
+          }
+
+          # Process each Godot version
           for godot_version in ${{ needs.matrix-setup.outputs.godot-versions-string }}; do
-            echo "Generating GDAP file for Godot $godot_version"
-            python3 generate_gdap.py app/build.gradle "gdap-files/GodotPlayGamesServices-godot-${godot_version}.gdap"
-            
-            # Update the binary name in the GDAP file to match the AAR name
-            sed -i "s/GodotPlayGamesServices.release.aar/GodotPlayGamesServices-godot-${godot_version}.aar/" "gdap-files/GodotPlayGamesServices-godot-${godot_version}.gdap"
+            if is_less_than_42 "$godot_version"; then
+              echo "Generating GDAP file for Godot $godot_version (pre-4.2)"
+              python3 generate_gdap.py app/build.gradle "gdap-files/GodotPlayGamesServices-godot-${godot_version}.gdap"
+              
+              # Update the binary name in the GDAP file to match the AAR name
+              sed -i "s/GodotPlayGamesServices.release.aar/GodotPlayGamesServices-godot-${godot_version}.aar/" "gdap-files/GodotPlayGamesServices-godot-${godot_version}.gdap"
+            else
+              echo "Packaging zip addon for Godot $godot_version (>= 4.2)"
+              # Create temporary directory layout
+              mkdir -p "temp-addon-${godot_version}/addons/GodotPlayGamesServices"
+              
+              # Copy plugin.cfg and export_plugin.gd from the demo folder
+              cp demo/addons/GodotPlayGamesServices/plugin.cfg "temp-addon-${godot_version}/addons/GodotPlayGamesServices/"
+              cp demo/addons/GodotPlayGamesServices/export_plugin.gd "temp-addon-${godot_version}/addons/GodotPlayGamesServices/"
+              
+              # Update version in plugin.cfg from the git tag name (e.g. v3.2.0 -> 3.2.0)
+              clean_version="${GITHUB_REF_NAME#v}"
+              sed -i "s/version=\"[^\"]*\"/version=\"${clean_version}\"/" "temp-addon-${godot_version}/addons/GodotPlayGamesServices/plugin.cfg"
+              
+              # Copy the compiled AAR file and rename it
+              cp aars/gpgs-godot-${godot_version}/GodotPlayGamesServices-godot-${godot_version}.aar "temp-addon-${godot_version}/addons/GodotPlayGamesServices/GodotPlayGamesServices.release.aar"
+              
+              # Create zip archive in gdap-files folder
+              (cd "temp-addon-${godot_version}" && zip -r "../../gdap-files/GodotPlayGamesServices-godot-${godot_version}.zip" addons)
+              
+              # Clean up
+              rm -rf "temp-addon-${godot_version}"
+            fi
           done
 
       - name: List generated files
         run: |
-          echo "Generated GDAP files:"
+          echo "Generated GDAP and Zip files:"
           ls -la gdap-files/
           echo "Available AAR files:"
           find aars/ -name "*.aar" -type f
@@ -67,6 +105,7 @@ jobs:
           files: |
             aars/*/*.aar
             gdap-files/*.gdap
+            gdap-files/*.zip
           draft: false
           prerelease: false
         env:

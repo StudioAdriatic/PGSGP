@@ -1,5 +1,11 @@
 # Changelog
 
+### 3.2.0
+- Migrated to the modern Godot Android plugin system (v2) for Godot versions 4.2 and later.
+- Expose plugin methods using the `@UsedByGodot` annotation.
+- Release artifacts for Godot >= 4.2 are now packaged as editor plugin zip files containing the `addons/GodotPlayGamesServices` structure.
+- Maintained legacy `.gdap` support for older Godot versions (4.0 and 4.1).
+
 ### 3.1.4
 - Added support for Godot 4.6.3 and Godot 4.5.2
 

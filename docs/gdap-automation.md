@@ -54,10 +54,12 @@ A reusable workflow that:
 ### 3. Python Script (`generate_gdap.py`)
 
 A Python script that:
-- Parses the `app/build.gradle` file
-- Extracts implementation dependencies (excluding test dependencies)
-- Generates properly formatted GDAP files
-- Supports command-line arguments for custom input/output paths
+- Parses the `app/build.gradle` file.
+- Extracts implementation dependencies (excluding test dependencies).
+- Generates properly formatted GDAP files (for Godot < 4.2).
+- Automatically updates/synchronizes the maven dependencies list inside the `export_plugin.gd` script (for Godot >= 4.2).
+- Automatically synchronizes the generated files in the local demo project.
+- Supports command-line arguments for custom input/output paths.
 
 **Usage:**
 ```bash

@@ -67,6 +67,42 @@ remote=[{deps_formatted}]
 """
     
     return gdap_content
+def update_export_plugin_dependencies(dependencies: List[str], export_plugin_path: str):
+    """
+    Update dependencies inside the export_plugin.gd file between marker comments.
+    """
+    if not os.path.exists(export_plugin_path):
+        print(f"Warning: export_plugin.gd not found at {export_plugin_path}")
+        return
+
+    try:
+        with open(export_plugin_path, 'r', encoding='utf-8') as file:
+            content = file.read()
+
+        # Generate formatted list of dependencies
+        deps_lines = []
+        for dep in dependencies:
+            deps_lines.append(f'\t\t\t"{dep}",')
+        deps_formatted = '\n'.join(deps_lines)
+
+        # Replace content between DEPENDENCIES_START and DEPENDENCIES_END
+        pattern = r'(#\s*DEPENDENCIES_START\s*\n)(.*?)(#\s*DEPENDENCIES_END)'
+        new_content, count = re.subn(
+            pattern,
+            rf'\g<1>{deps_formatted}\n\t\t\t\g<3>',
+            content,
+            flags=re.DOTALL
+        )
+
+        if count > 0:
+            with open(export_plugin_path, 'w', encoding='utf-8') as file:
+                file.write(new_content)
+            print(f"Successfully updated dependencies in: {export_plugin_path}")
+        else:
+            print(f"Warning: Marker comments not found in {export_plugin_path}")
+
+    except Exception as e:
+        print(f"Error updating {export_plugin_path}: {e}")
 
 def main():
     """
@@ -111,6 +147,20 @@ def main():
     except Exception as e:
         print(f"Error writing to {output_file}: {e}")
         sys.exit(1)
+
+    # Also update the copy in the demo plugins folder
+    demo_gdap_file = "demo/android/plugins/GodotPlayGamesServices.gdap"
+    if os.path.exists(os.path.dirname(demo_gdap_file)):
+        try:
+            with open(demo_gdap_file, 'w', encoding='utf-8') as file:
+                file.write(gdap_content)
+            print(f"Successfully updated copy at: {demo_gdap_file}")
+        except Exception as e:
+            print(f"Error writing to {demo_gdap_file}: {e}")
+
+    # Also update the export_plugin.gd file inside the demo/addons folder
+    export_plugin_file = "demo/addons/GodotPlayGamesServices/export_plugin.gd"
+    update_export_plugin_dependencies(dependencies, export_plugin_file)
 
 if __name__ == "__main__":
     main()

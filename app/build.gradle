@@ -1,6 +1,38 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 
+def getGodotVersion() {
+    def godotLibDir = file('../godot-lib')
+    if (godotLibDir.exists()) {
+        def aarFiles = godotLibDir.listFiles().findAll { it.name.endsWith('.aar') }
+        if (!aarFiles.isEmpty()) {
+            def match = aarFiles[0].name =~ /godot-lib\.([\d\.]+)\.stable/
+            if (match) {
+                return match[0][1]
+            }
+        }
+    }
+    return "4.6.3" // fallback default
+}
+
+def godotVersion = getGodotVersion()
+def isLess42 = {
+    def parts = godotVersion.split('\\.')
+    if (parts.length >= 2) {
+        try {
+            int major = parts[0].toInteger()
+            int minor = parts[1].toInteger()
+            if (major < 4) return true
+            if (major == 4 && minor < 2) return true
+        } catch (NumberFormatException e) {
+            // ignore
+        }
+    }
+    return false
+}.call()
+
+println "Building for Godot version: ${godotVersion} (Less than 4.2: ${isLess42})"
+
 android {
     namespace "com.studioadriatic.gpgs"
     compileSdk 34
@@ -36,6 +68,14 @@ android {
     testOptions {
         unitTests {
             includeAndroidResources = true
+        }
+    }
+
+    sourceSets {
+        main {
+            if (isLess42) {
+                java.srcDirs += 'src/compat/java'
+            }
         }
     }
 
