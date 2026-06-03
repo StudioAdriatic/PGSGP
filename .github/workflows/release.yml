@@ -85,7 +85,7 @@ jobs:
               cp aars/gpgs-godot-${godot_version}/GodotPlayGamesServices-godot-${godot_version}.aar "temp-addon-${godot_version}/addons/GodotPlayGamesServices/GodotPlayGamesServices.release.aar"
               
               # Create zip archive in gdap-files folder
-              (cd "temp-addon-${godot_version}" && zip -r "../../gdap-files/GodotPlayGamesServices-godot-${godot_version}.zip" addons)
+              (cd "temp-addon-${godot_version}" && zip -r "../gdap-files/GodotPlayGamesServices-godot-${godot_version}.zip" addons)
               
               # Clean up
               rm -rf "temp-addon-${godot_version}"
