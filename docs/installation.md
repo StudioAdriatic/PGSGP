@@ -76,26 +76,41 @@ Before installing the plugin, ensure you have:
 
 ## Project Configuration
 
-### 1. Android Export Settings
+### For Godot 4.2 and Later (v2 Plugin System)
 
+The v2 plugin system automates all manifest configuration and permission requests, removing the need to manually modify gitignored files inside the `android/build/` directory.
+
+#### 1. Android Export Settings
 In Godot's **Project Settings → Export → Android**:
+- ✅ **Use Gradle Build**: Must be enabled
+- ✅ **GodotPlayGamesServices**: Enable in the Plugins list
+- **Min SDK**: 21 or higher
+- **Target SDK**: 33 or higher
 
-#### Required Settings:
+#### 2. Configure Google Play Games App ID
+You can configure your Google Play Games App ID directly inside your Android export preset:
+1. Navigate to **Project → Export...**
+2. Select your Android export preset.
+3. On the right-hand options panel, scroll down to the **Play Games Services** section.
+4. Input your Google Play Games App ID into the `play_games_services/app_id` field.
+
+Godot will automatically request the required permissions (`INTERNET` and `ACCESS_NETWORK_STATE`) and merge your `app_id` metadata into the generated Android manifest at export time.
+
+---
+
+### For Godot 4.0 and 4.1 (v1 Plugin System)
+
+For older versions of Godot, manual manifest configuration and resource mapping are required.
+
+#### 1. Android Export Settings
+In Godot's **Project Settings → Export → Android**:
 - ✅ **Use Custom Build**: Must be enabled
 - ✅ **GodotPlayGamesServices**: Enable in Plugins section
 - **Min SDK**: 21 or higher
 - **Target SDK**: 33 or higher
 
-#### Permissions:
-Add these permissions to your Android manifest:
-```xml
-<uses-permission android:name="android.permission.INTERNET" />
-<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-```
-
-### 2. Android Manifest Configuration
-
-Create or modify `android/build/AndroidManifest.xml`:
+#### 2. Android Manifest Configuration
+Add the required permissions and metadata to your `android/build/AndroidManifest.xml` file. Note that this file is inside the gitignored `android/build` folder, so you may need to whitelist it in your `.gitignore` (`!android/build/AndroidManifest.xml`):
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -131,9 +146,8 @@ Create or modify `android/build/AndroidManifest.xml`:
 </manifest>
 ```
 
-### 3. String Resources
-
-Create `android/build/res/values/strings.xml`:
+#### 3. String Resources
+Create or modify `android/build/res/values/strings.xml` to include your App ID (whitelist this file in your `.gitignore` with `!android/build/res/values/strings.xml`):
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
@@ -141,7 +155,6 @@ Create `android/build/res/values/strings.xml`:
     <string name="app_id">YOUR_GOOGLE_PLAY_GAMES_APP_ID</string>
 </resources>
 ```
-
 Replace `YOUR_GOOGLE_PLAY_GAMES_APP_ID` with your actual app ID from Google Play Console.
 
 ## Google Play Console Setup

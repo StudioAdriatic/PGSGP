@@ -48,3 +48,36 @@ class AndroidExportPlugin extends EditorExportPlugin:
 			"org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3",
 			# DEPENDENCIES_END
 		])
+
+	# Return the export options offered by the plugin.
+	func _get_export_options(platform):
+		if platform is EditorExportPlatformAndroid:
+			return [
+				{
+					"option": {
+						"name": "play_games_services/app_id",
+						"type": TYPE_STRING
+					},
+					"default_value": ""
+				}
+			]
+		return []
+
+	# Update the manifest element contents to inject required permissions.
+	func _get_android_manifest_element_contents(platform, debug):
+		if not _supports_platform(platform):
+			return ""
+		return """
+		<uses-permission android:name="android.permission.INTERNET" />
+		<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+		"""
+
+	# Update the application element contents to inject the APP_ID.
+	func _get_android_manifest_application_element_contents(platform, debug):
+		if not _supports_platform(platform):
+			return ""
+		var app_id = get_option("play_games_services/app_id")
+		if app_id != "":
+			return '<meta-data android:name="com.google.android.gms.games.APP_ID" android:value="\\ ' + app_id + '" />'
+		return ""
+
